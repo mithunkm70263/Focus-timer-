@@ -38,7 +38,9 @@
     }
   }
 
-  // Gentle, realistic clock ticking sound (Single beat, subtle and quiet for focus)
+  // Analog wall clock tick — a warm, crisp single "tok" per second.
+  // Designed to be present enough to feel time passing, but non-fatiguing
+  // over long focus sessions. Modeled after a mechanical escapement clock.
   function playClockTickSound() {
     if (!state.soundEnabled) return;
     try {
@@ -47,47 +49,59 @@
 
       const now = audioCtx.currentTime;
 
-      // 1. Escapement tick transient (tiny 8ms click, quiet and crisp)
-      const bufferSize = Math.floor(audioCtx.sampleRate * 0.008); // 8ms
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
+      // Layer 1: Sharp transient click (the escapement mechanism snapping)
+      // A very short burst of filtered noise gives that initial "tok" attack.
+      const clickLen = Math.floor(audioCtx.sampleRate * 0.004); // 4ms — ultra short
+      const clickBuf = audioCtx.createBuffer(1, clickLen, audioCtx.sampleRate);
+      const clickData = clickBuf.getChannelData(0);
+      for (let i = 0; i < clickLen; i++) {
+        // Exponential decay envelope for a sharp percussive transient
+        clickData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (clickLen * 0.15));
       }
 
-      const noiseSource = audioCtx.createBufferSource();
-      noiseSource.buffer = buffer;
+      const clickSrc = audioCtx.createBufferSource();
+      clickSrc.buffer = clickBuf;
 
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(2400, now);
-      filter.Q.setValueAtTime(3.5, now);
+      // Highpass filter to keep the click crisp, not boomy
+      const clickHP = audioCtx.createBiquadFilter();
+      clickHP.type = 'highpass';
+      clickHP.frequency.setValueAtTime(1800, now);
 
-      const gainNode = audioCtx.createGain();
-      gainNode.gain.setValueAtTime(0.06, now); // Gentle, subtle volume
-      gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.008);
+      // Slight resonant peak to give it character
+      const clickBP = audioCtx.createBiquadFilter();
+      clickBP.type = 'peaking';
+      clickBP.frequency.setValueAtTime(3200, now);
+      clickBP.Q.setValueAtTime(2, now);
+      clickBP.gain.setValueAtTime(4, now);
 
-      noiseSource.connect(filter);
-      filter.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      noiseSource.start(now);
+      const clickGain = audioCtx.createGain();
+      clickGain.gain.setValueAtTime(0.14, now);
+      clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.015);
 
-      // 2. Subtle clock body resonance (gentle low wood tick)
-      const osc = audioCtx.createOscillator();
-      const oscGain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(750, now);
-      osc.frequency.exponentialRampToValueAtTime(160, now + 0.012);
+      clickSrc.connect(clickHP);
+      clickHP.connect(clickBP);
+      clickBP.connect(clickGain);
+      clickGain.connect(audioCtx.destination);
+      clickSrc.start(now);
 
-      oscGain.gain.setValueAtTime(0.04, now); // Very quiet
-      oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+      // Layer 2: Wooden body resonance (the clock case vibrating briefly)
+      // A quick pitched tone that decays fast, giving warmth to the tick.
+      const bodyOsc = audioCtx.createOscillator();
+      const bodyGain = audioCtx.createGain();
+      bodyOsc.type = 'sine';
+      bodyOsc.frequency.setValueAtTime(1200, now);
+      bodyOsc.frequency.exponentialRampToValueAtTime(400, now + 0.025);
 
-      osc.connect(oscGain);
-      oscGain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.012);
+      bodyGain.gain.setValueAtTime(0.08, now);
+      bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+
+      bodyOsc.connect(bodyGain);
+      bodyGain.connect(audioCtx.destination);
+      bodyOsc.start(now);
+      bodyOsc.stop(now + 0.04);
+
     } catch (e) {
-      // Audio autoplay policy fallback
+      // Audio autoplay policy fallback — silently ignore
     }
   }
 
