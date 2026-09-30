@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Minimalist Split-Flap Focus Study Timer with 30, 60, and 90-minute tracks.">
+  <title>Focus Study Timer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container" id="app">
+    <!-- Top Navigation Header -->
+    <header class="top-bar">
+      <div class="top-left">
+        <button class="icon-btn" id="btn-reset-top" title="Reset Timer" aria-label="Reset Timer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 3 Study Tracks: 30m, 60m, 90m -->
+      <nav class="track-selector" role="tablist" aria-label="Study Timer Tracks">
+        <button class="track-btn active" role="tab" aria-selected="true" data-minutes="30" id="track-30">
+          <span class="track-label">30 MIN</span>
+        </button>
+        <button class="track-btn" role="tab" aria-selected="false" data-minutes="60" id="track-60">
+          <span class="track-label">60 MIN</span>
+        </button>
+        <button class="track-btn" role="tab" aria-selected="false" data-minutes="90" id="track-90">
+          <span class="track-label">90 MIN</span>
+        </button>
+      </nav>
+
+      <div class="top-right">
+        <!-- Sound / Audio FX Toggle -->
+        <button class="icon-btn" id="btn-sound" title="Toggle Mechanical Audio & Chime" aria-label="Toggle Sound">
+          <svg id="icon-sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <svg id="icon-sound-off" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+
+        <!-- Layout Toggle (2x2 Grid / 1x4 Inline) -->
+        <button class="icon-btn" id="btn-layout" title="Toggle Grid / Linear Display" aria-label="Toggle Layout">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </button>
+
+        <!-- Settings / Ambient Modal Toggle -->
+        <button class="icon-btn" id="btn-settings" title="Study Settings & Ambient Noise" aria-label="Settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 2 17 12 22 22 17 22 7 12 2"></polygon>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Flip Display -->
+    <main class="timer-viewport">
+      <div class="flip-clock-grid" id="clock-grid">
+        <!-- Minutes Section (Top Row in 2x2) -->
+        <div class="digits-group minutes-group" aria-label="Minutes">
+          <div class="flip-card-unit" id="unit-m10" data-current="3">
+            <div class="flip-card">
+              <div class="card-half top-half static-top"><span class="digit">3</span></div>
+              <div class="card-half bottom-half static-bottom"><span class="digit">3</span></div>
+              <div class="card-half top-half moving-top"><span class="digit">3</span><div class="flap-shadow"></div></div>
+              <div class="card-half bottom-half moving-bottom"><span class="digit">3</span><div class="flap-shadow"></div></div>
+              <div class="card-hinge hinge-left"></div>
+              <div class="card-hinge hinge-right"></div>
+              <div class="card-seam"></div>
+            </div>
+          </div>
+          <div class="flip-card-unit" id="unit-m1" data-current="0">
+            <div class="flip-card">
+              <div class="card-half top-half static-top"><span class="digit">0</span></div>
+              <div class="card-half bottom-half static-bottom"><span class="digit">0</span></div>
+              <div class="card-half top-half moving-top"><span class="digit">0</span><div class="flap-shadow"></div></div>
+              <div class="card-half bottom-half moving-bottom"><span class="digit">0</span><div class="flap-shadow"></div></div>
+              <div class="card-hinge hinge-left"></div>
+              <div class="card-hinge hinge-right"></div>
+              <div class="card-seam"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seconds Section (Bottom Row in 2x2) -->
+        <div class="digits-group seconds-group" aria-label="Seconds">
+          <div class="flip-card-unit" id="unit-s10" data-current="0">
+            <div class="flip-card">
+              <div class="card-half top-half static-top"><span class="digit">0</span></div>
+              <div class="card-half bottom-half static-bottom"><span class="digit">0</span></div>
+              <div class="card-half top-half moving-top"><span class="digit">0</span><div class="flap-shadow"></div></div>
+              <div class="card-half bottom-half moving-bottom"><span class="digit">0</span><div class="flap-shadow"></div></div>
+              <div class="card-hinge hinge-left"></div>
+              <div class="card-hinge hinge-right"></div>
+              <div class="card-seam"></div>
+            </div>
+          </div>
+          <div class="flip-card-unit" id="unit-s1" data-current="0">
+            <div class="flip-card">
+              <div class="card-half top-half static-top"><span class="digit">0</span></div>
+              <div class="card-half bottom-half static-bottom"><span class="digit">0</span></div>
+              <div class="card-half top-half moving-top"><span class="digit">0</span><div class="flap-shadow"></div></div>
+              <div class="card-half bottom-half moving-bottom"><span class="digit">0</span><div class="flap-shadow"></div></div>
+              <div class="card-hinge hinge-left"></div>
+              <div class="card-hinge hinge-right"></div>
+              <div class="card-seam"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtle Progress Ring / Line indicator -->
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </main>
+
+    <!-- Bottom Floating Control Pill (Identical to image) -->
+    <footer class="bottom-controls-wrapper">
+      <div class="control-pill" id="control-pill">
+        <!-- +1 Minute Quick Add Button -->
+        <button class="pill-btn add-btn" id="btn-add-min" title="Add 1 Minute" aria-label="Add 1 Minute">
+          <span>+1</span>
+        </button>
+
+        <div class="pill-divider"></div>
+
+        <!-- Center Play/Pause Circle Button -->
+        <button class="pill-btn play-btn" id="btn-play-pause" title="Start/Pause Timer" aria-label="Start or Pause Timer">
+          <div class="play-icon-circle">
+            <svg id="icon-play" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="6 4 20 12 6 20 6 4"></polygon>
+            </svg>
+            <svg id="icon-pause" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+              <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+            </svg>
+          </div>
+        </button>
+
+        <div class="pill-divider"></div>
+
+        <!-- Reset Button -->
+        <button class="pill-btn close-btn" id="btn-reset-bottom" title="Reset Current Track" aria-label="Reset Timer">
+          <div class="reset-icon-circle">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </div>
+        </button>
+      </div>
+    </footer>
+
+    <!-- Settings & Ambient Dialog Modal -->
+    <dialog class="settings-modal" id="settings-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Focus & Audio Settings</h2>
+          <button class="close-modal-btn" id="btn-close-modal" aria-label="Close settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="settings-body">
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Clock Ticking Sound</span>
+              <span class="setting-desc">Play subtle analog tick as timer counts</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setting-flip-sound" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Completion Bell Chime</span>
+              <span class="setting-desc">Singing bowl chime when session completes</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setting-chime-sound" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Ambient Study Sound</span>
+              <span class="setting-desc">Continuous focus audio stream</span>
+            </div>
+            <select id="setting-ambient-type" class="styled-select">
+              <option value="none">None (Silence)</option>
+              <option value="brown">Deep Brown Noise</option>
+              <option value="rain">Soft Rain</option>
+              <option value="tick">Minimalist Tick</option>
+            </select>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Display Layout</span>
+              <span class="setting-desc">2x2 Grid (as in image) or 1x4 Row</span>
+            </div>
+            <div class="layout-toggle-pills">
+              <button type="button" class="layout-pill active" data-layout="grid">2x2 Grid</button>
+              <button type="button" class="layout-pill" data-layout="row">Inline Row</button>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Keep Screen Awake (Wake Lock)</span>
+              <span class="setting-desc">Prevent display from sleeping while studying</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setting-wake-lock" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Fullscreen Mode</span>
+              <span class="setting-desc">Immersive distraction-free study</span>
+            </div>
+            <button class="action-btn" id="btn-toggle-fullscreen">Enter Fullscreen</button>
+          </div>
+        </div>
+
+        <div class="shortcuts-guide">
+          <h3>Keyboard Shortcuts</h3>
+          <div class="shortcut-tags">
+            <span><kbd>Space</kbd> Play / Pause</span>
+            <span><kbd>R</kbd> Reset</span>
+            <span><kbd>+1</kbd> / <kbd>+</kbd> Add Min</span>
+            <span><kbd>1</kbd> 30m</span>
+            <span><kbd>2</kbd> 60m</span>
+            <span><kbd>3</kbd> 90m</span>
+            <span><kbd>M</kbd> Mute</span>
+            <span><kbd>F</kbd> Fullscreen</span>
+          </div>
+        </div>
+      </div>
+    </dialog>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
